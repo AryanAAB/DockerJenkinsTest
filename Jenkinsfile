@@ -28,7 +28,6 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            when { success() }
             steps {
                 sh 'docker build -t $DOCKER_IMAGE:latest .'
                 sh 'docker images'
