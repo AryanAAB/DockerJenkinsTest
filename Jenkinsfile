@@ -17,13 +17,21 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest --disable-warnings'
+                sh '''
+                    . venv/bin/activate
+                    pytest --disable-warnings
+                '''
             }
         }
 
@@ -41,8 +49,10 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
-                    sh 'docker push $DOCKER_IMAGE:latest'
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push $DOCKER_IMAGE:latest
+                    '''
                 }
             }
         }
